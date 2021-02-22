@@ -4,7 +4,7 @@
 ## Řidící počítač
 
 * Odroid C2
-* Ubuntu 20.04.4 minimal (
+* Ubuntu 20.04.4 minimal ()
 * ROS 2 Foxy; Debain binaries (https://index.ros.org/doc/ros2/Installation/Foxy/Linux-Install-Debians/)
   * ros-foxy-ros-base
 * `sudo apt install git htop nano mc python3-colcon-common-extensions   `
