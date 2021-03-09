@@ -21,7 +21,8 @@ setup(
     entry_points={
         'console_scripts': [
             'distance_measurement = irradroom_python.distance_measurement:main',
-            'i2c_devices = irradroom_python.i2c_devices:main'
+            'i2c_devices = irradroom_python.i2c_devices:main',
+            'source_position = irradroom_python.source_position:main'
         ],
     },
 )
