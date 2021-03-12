@@ -45,6 +45,8 @@ class RangeMeasure(Node):
         try:
             msg = Range()
             msg.range = self.read_data("dist")
+            msg.min_range = 10.0
+            msg.max_range = 500.0
             print("distance:", msg.range)
             self.publisher.publish(msg)
             self.i += 1

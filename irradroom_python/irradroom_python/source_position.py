@@ -44,7 +44,7 @@ class SourcePosition(Node):
             else:
                 pos += 1
                 ar += [ch]
-        print(ar)
+        #print(ar)
         return float(ord(ar[4]) << 8 | ord(ar[5]))
 
 
@@ -52,6 +52,8 @@ class SourcePosition(Node):
         try:
             msg = Range()
             msg.range = self.read()
+            msg.min_range = 15.0
+            msg.max_range = 150.0
             print("distance:", msg.range)
             self.publisher.publish(msg)
             self.i += 1
