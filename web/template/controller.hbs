@@ -1,0 +1,193 @@
+{% extends "base.hbs" %}
+{% block head %}
+
+
+{% end %}
+
+{% block content %}
+
+<!-- <link href="dist/css/tabulator.min.css" rel="stylesheet">
+<script type="text/javascript" src="dist/js/tabulator.min.js"></script> -->
+<link href="https://unpkg.com/tabulator-tables@4.9.3/dist/css/tabulator.min.css" rel="stylesheet">
+<script type="text/javascript" src="https://unpkg.com/tabulator-tables@4.9.3/dist/js/tabulator.min.js"></script>
+
+
+<div class="row row-cols-1 row-cols-md-3 g-4">
+  <div class="col">
+    <div class="card h-100">
+      <div class="card-header">
+        <h4>Vzdálenost stolu</h4>
+      </div>
+      <div class="card-body text-center">
+          <b><span id="distance_val">---</span></b> cm
+      </div>
+    </div>
+  </div>
+
+
+    <div class="col">
+      <div class="card h-100">
+        <div class="card-header">
+          <h4>Dveře místnosti</h4>
+        </div>
+        <div class="card-body text-center">
+            <b>Otevřěno/Zavřeno</b>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="card h-100">
+        <div class="card-header">
+          <h4>Stav zářiče</h4>
+        </div>
+        <div class="card-body text-center">
+            <b>Zavřeno/Zářič A/Zářič B/Pohyb</b>
+        </div>
+      </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        Aktuální program: <b><span>Název programu</span></b>
+        Spustit
+        Zavřít program
+    </div>
+    <div class="card-body">
+
+        <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item active">Start</li>
+            <li class="breadcrumb-item">Zářič_A (30s)</li>
+            <li class="breadcrumb-item">Zářič_B (30s)</li>
+            <li class="breadcrumb-item active">Konec</li>
+          </ol>
+        </nav>
+
+
+        <form id="program_step_editor" style="display: none;">
+          <div class="mb-3">
+            <label for="exampleInputEmail1" class="form-label">Krok</label>
+            <select class="form-control">
+                <option>Mezera</option>
+                <option>Zářič A</option>
+                <option>Zářič B</option>
+            </select>
+            <div id="emailHelp" class="form-text">Typ operace.</div>
+          </div>
+          <div class="mb-3">
+            <label for="exampleInputPassword1" class="form-label">Délka kroku</label>
+            <input type="number" class="form-control" id="step_length", value="50">
+          </div>
+          <div class="mb-3">
+            <label for="exampleInputPassword1" class="form-label">Pozice</label>
+            <input type="number" class="form-control" id="step_number", value="0">
+            <div id="step_number" class="form-text">Pozice operace v programu. Pokud chcete vložit do existujícího programu, zadejte pozici před kterou to chcete vložit</div>
+          </div>
+          <button type="submit" class="btn btn-primary">Add</button>
+        </form>
+
+    </div>
+</div>
+
+
+
+<div class="card">
+    <div class="card-header">
+        Přehled programů
+    </div>
+    <div class="card-body">
+        Tady bude tabulka s programy
+        <button onclick="NewProgram()">Vytvořit nový program</button>
+        <div id="program_table"></div>
+    </div>
+</div>
+
+
+
+<div class="card">
+    <div class="card-header">
+        Přehled měření
+    </div>
+    <div class="card-body">
+        Tady bude tabulka s provedenými měřeními
+    </div>
+</div>
+
+
+
+
+
+<script>
+
+    function load_progam(id){
+        console.log("Load progarm", id);
+
+    }
+
+
+    function NewProgram(){
+        $.ajax({
+            url: "/controller/create_program",
+            //data: data,
+            success: function(e){
+                console.log(e)
+                load_progam(e.program_id);
+            },
+            //dataType: dataType
+        });
+    }
+
+    //define data array
+    var program_tabledata = [
+        {id:1, name:"Oli Bob", progress:12, gender:"male", rating:1, col:"red", dob:"19/02/1984", car:1},
+        {id:2, name:"Mary May", progress:1, gender:"female", rating:2, col:"blue", dob:"14/05/1982", car:true},
+        {id:3, name:"Christine Lobowski", progress:42, gender:"female", rating:0, col:"green", dob:"22/05/1982", car:"true"},
+        {id:4, name:"Brendon Philips", progress:100, gender:"male", rating:1, col:"orange", dob:"01/08/1980"},
+        {id:5, name:"Margret Marmajuke", progress:16, gender:"female", rating:5, col:"yellow", dob:"31/01/1999"},
+        {id:6, name:"Frank Harbours", progress:38, gender:"male", rating:4, col:"red", dob:"12/05/1966", car:1},
+    ];
+
+    //initialize table
+    var table = new Tabulator("#program_table", {
+        data:program_tabledata, //assign data to table
+        autoColumns:true, //create columns from data field names
+        columns:[
+            {formatter:"rownum", hozAlign:"center", width:40},
+
+            {title:"Progress", field:"progress", formatter:"progress", formatterParams:{color:["#00dd00", "orange", "rgb(255,0,0)"]}, sorter:"number", width:100},
+            {title:"Rating", field:"rating", formatter:"star", formatterParams:{stars:6}, hozAlign:"center", width:120},
+            {title:"name", field:"car", hozAlign:"center", formatter:"tickCross", width:500},
+            {title:"Col", field:"col" ,formatter:"color", width:50},
+            {title:"Line Wraping", field:"lorem" ,formatter:"textarea"},
+            {formatter:"buttonCross", width:30, hozAlign:"center"}
+            ],
+    });
+
+
+    source_position_msg.subscribe(function(msg) {
+      $("#source_position_val").html(msg.range.toFixed(2));
+    });
+
+    distance_msg.subscribe(function(msg) {
+      $("#distance_val").html(msg.range.toFixed(2));
+    });
+
+
+    var motor_cmd = new ROSLIB.Topic({
+        ros: ros,
+        name: 'motor_cmd',
+        messageType: 'std_msgs/String'
+    });
+
+    function send_motor_cmd(data){
+        var msg = new ROSLIB.Message({
+          data: data
+        });
+        motor_cmd.publish(msg);
+    }
+
+</script>
+
+{% end %}

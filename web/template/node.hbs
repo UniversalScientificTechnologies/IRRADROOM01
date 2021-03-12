@@ -1,0 +1,40 @@
+{% extends "base.hbs" %}
+{% block head %}
+
+
+{% end %}
+
+{% block content %}
+
+{% for feature in NodeParams['feature'] %}
+<div>
+{% try %}
+  {% if "__" in feature%}
+    {% set node_param = NodeParams['feature'][feature]['id'] = feature.split('__')[1] %}
+    {% module NodeFeature(feature, NodeParams['feature'][feature]) %}
+  {% else %}
+    {% set node_param = NodeParams['feature'][feature]['id'] = 0 %}
+    {% module NodeFeature(feature, NodeParams['feature'][feature]) %}
+  {% end %}
+{% except %}
+  ERR {{feature}}
+{% end %}
+
+</div>
+{%end%}
+{#
+<hr>
+<div class="alert alert-success" role="alert" style="overflow: auto;">
+  {{NodeParams}}
+
+  <ul>
+  {% for feature in NodeParams['feature'] %}
+  <li>{{feature}} >> {{NodeParams['feature'][feature]}}</li>
+  {%end%}
+  </ul>
+</div>
+#}
+
+
+
+{% end %}

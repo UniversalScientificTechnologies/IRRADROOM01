@@ -1,0 +1,120 @@
+{% extends "base.hbs" %}
+{% block head %}
+
+
+{% end %}
+
+{% block content %}
+
+
+
+<div class="row row-cols-1 row-cols-md-3 g-4">
+  <div class="col">
+    <div class="card h-100">
+      <div class="card-header">
+        <h4>Dálkoměr</h4>
+      </div>
+      <div class="card-body">
+          Vzdáleost: <span id="distance_val">---</span> cm<br>
+      </div>
+      <div class="card-footer">
+        <small class="text-muted"></small>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="col">
+    <div class="card h-100">
+      <div class="card-header">
+        <h4>Zářič</h4>
+      </div>
+      <div class="card-body">
+        Vzdáleost vzorku: <span id="source_position_val">---</span> mm<br>
+      </div>
+      <div class="card-footer">
+        <small class="text-muted"></small>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="col">
+    <div class="card h-100">
+      <div class="card-header">
+        <h4>Motor posuvu zářiče</h4>
+      </div>
+      <div class="card-body">
+          <div class="btn-group" role="group" aria-label="Basic example">
+              <button type="button" class="btn btn-primary" onclick="send_motor_cmd('posA')"><</button>
+              <button type="button" class="btn btn-primary" onclick="send_motor_cmd('stop')">|</button>
+              <button type="button" class="btn btn-primary" onclick="send_motor_cmd('posB')">></button>
+            </div>
+
+            <div class="btn-group" role="group" aria-label="Basic example">
+                <button type="button" class="btn btn-danger" onclick="send_motor_cmd('float')">Stop</button>
+              </div>
+      </div>
+      <div class="card-footer">
+        <small class="text-muted"></small>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div>
+Stav: Dálkoměr
+
+</div>
+
+<div>
+Stav: Pozice vzorku
+
+</div>
+
+
+<div>
+Stav: Motor posuvu
+
+</div>
+
+<div>
+Stav: Dveře ozařovny
+
+</div>
+
+<div>
+Stav: ???
+
+</div>
+
+
+<script>
+
+
+    source_position_msg.subscribe(function(msg) {
+      $("#source_position_val").html(msg.range.toFixed(2));
+    });
+
+    distance_msg.subscribe(function(msg) {
+      $("#distance_val").html(msg.range.toFixed(2));
+    });
+
+
+    var motor_cmd = new ROSLIB.Topic({
+        ros: ros,
+        name: 'motor_cmd',
+        messageType: 'std_msgs/String'
+    });
+
+    function send_motor_cmd(data){
+        var msg = new ROSLIB.Message({
+          data: data
+        });
+        motor_cmd.publish(msg);
+    }
+
+</script>
+
+{% end %}
