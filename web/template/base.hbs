@@ -6,20 +6,15 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ escape(handler.settings["name"]) }}</title>
-    <!-- <link rel="stylesheet" href="/static/tether/css/tether.min.css"> -->
     <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="/static/font-awesome/css/font-awesome.min.css">
-    <!-- <link rel="stylesheet" href="/static/lobibox/css/lobibox.css"> -->
-    <!-- <link rel="stylesheet" href="/static/PymlabChart/dist/css/jquery.orgchart.css"> -->
     <link rel="stylesheet" href="/static/css/simple-sidebar.css">
     <link rel="stylesheet" href="/static/css/style.css">
     <link rel="shortcut icon" href="/static/media/favicon.ico">
-    <!-- <script src="/static/js/eventemitter2.js"></script> -->
     <script src="/static/roslib.min.js"></script>
 
     <script src="/static/jquery-3.6.0.min.js"></script>
     <script src="/static/jquery.cookie.js"></script>
-    <!-- <script src="/static/tether/js/tether.min.js"></script> -->
     <script src="/static/bootstrap/js/bootstrap.min.js"></script>
     <!-- <script src="/static/lobibox/js/lobibox.js"></script> -->
 
@@ -54,6 +49,7 @@
 
     ros.connect($.cookie("rosbridge_url"));
 
+
     var source_position_msg = new ROSLIB.Topic({
       ros : ros,
       name : '/source_position',
@@ -65,6 +61,13 @@
       ros : ros,
       name : '/distance',
       messageType : 'sensor_msgs/Range'
+    });
+
+
+    var door_msg = new ROSLIB.Topic({
+      ros : ros,
+      name : '/door_status',
+      messageType : 'std_msgs/Int8'
     });
 
   </script>

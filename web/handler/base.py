@@ -7,13 +7,44 @@ import tornado.web
 import glob
 import json
 import io
-import os, sys
 import subprocess
 import sqlite3
+import time, datetime
+import os, sys
+import glob
+import random
+
+
+'''
+
+
+MongoDB seznam databazi:
+
+
+
+programs
+
+
+runs
+
+
+users
+
+'''
 
 
 #import rosparam
 import hashlib
+import pymongo
+from bson.json_util import dumps
+import bson
+
+def dict_factory(cursor, row):
+    d = {}
+    for idx, col in enumerate(cursor.description):
+        d[col[0]] = row[idx]
+
+    return d
 
 class BaseHandler(tornado.web.RequestHandler):
     def get_current_user(self):
@@ -48,19 +79,115 @@ class Controller(BaseHandler):
 
 class Controller_get_programs(BaseHandler):
     def get(self):
-        con = sqlite3.connect('~/irradroom.db')
+
+        mdb = pymongo.MongoClient("mongodb://localhost:27017/").IRRADROOM
+        programs = mdb.programs.find({})
+        programs = list(programs)
+
+        print(programs)
+        self.write(dumps(programs))
+
+
+class Controller_get_jobs(BaseHandler):
+    def get(self):
+
+        mdb = pymongo.MongoClient("mongodb://localhost:27017/").IRRADROOM
+        jobs = mdb.runs.find({}) #TODO: filtrovat podle autora, seradit podle stavu a podle data
+        jobs = list(jobs)
+
+        print(jobs)
+        self.write(dumps(jobs))
+
+
+class Controller_get_program(BaseHandler):
+    def get(self, prog_id):
+        self.set_header("Content-Type", "application/json")
+
+
+        mdb = pymongo.MongoClient("mongodb://localhost:27017/").IRRADROOM
+        programs = mdb.programs.find({'_id': bson.ObjectId(prog_id)})
+
+        programs = list(programs)[0]
+
+        print(programs)
+        self.write(dumps(programs))
+
+
+class Controller_queue_program(BaseHandler):
+    def get(self, prog_id):
+        self.set_header("Content-Type", "application/json")
+
+
+        mdb = pymongo.MongoClient("mongodb://localhost:27017/").IRRADROOM
+        program = mdb.programs.find({'_id': bson.ObjectId(prog_id)})
+        
+        program = list(program)[0]
+        program['_id'] = bson.ObjectId()
+        program['run_key'] = random.randint(1000,9999)
+        program['added'] = datetime.datetime.now()
+        program['state'] = 0
+        program['job_recod'] = []
+        program['run_author'] = ''
+
+        print(program)
+        print(program['job'])
+
+        mdb.runs.insert_one(program)
+        self.write(dumps(program))
+
 
 class Controller_create_program(BaseHandler):
     def get(self):
-        con = sqlite3.connect('/root/irradroom.db')
-        cur = con.cursor()
-        cur.execute("INSERT INTO programs ('created', 'name', 'author_system', 'author_name') VALUES (datetime('now'), 'Nový program', 'Autor', 'Autor')")
-        print(cur.lastrowid)
-        con.commit()
 
-        data = {"program_id": cur.lastrowid}
+        pid = bson.ObjectId()
+
+        data = {
+            '_id': pid,
+            'job': [],
+            'description': '',
+            'created': time.time(),
+            'name': 'Nový program',
+            'author_system': self.current_user.get('login'),
+            'author_name': self.current_user.get('login')
+        }
+
+        mdb = pymongo.MongoClient("mongodb://localhost:27017/").IRRADROOM
+        programs = mdb.programs.insert_one(data)
+
+        data = {"program_id": str(pid)}
         self.write(data)
 
+class Controller_edit_program(BaseHandler):
+    def get(self, program, step):
+
+        self.set_header("Content-Type", "application/json")
+        print("program", program)
+
+        step_data = {
+            "operation": self.get_argument('step_operation', 'sleep'),
+            "duration": self.get_argument('step_duration', 0)
+        }
+
+
+        mdb = pymongo.MongoClient("mongodb://localhost:27017/").IRRADROOM
+        programs = mdb.programs.update({'_id': bson.ObjectId(program)},     
+            {"$push": { "job": { "$each": [step_data], "$position": 3 } }}
+        )
+
+
+        # with open('/data/prog/{}.json'.format(program), 'r+') as f:
+        #     data = json.load(f)
+        #     if not 'job' in data:
+        #         data['job'] = []
+
+        #     data['job'].insert(int(step), step_data)
+
+        #     f.seek(0)
+        #     json.dump(data, f, indent=4)
+        #     f.truncate()
+        #     f.close()
+
+        self.write(json.dumps(step_data))
 
 class State(BaseHandler):
     def get(self):

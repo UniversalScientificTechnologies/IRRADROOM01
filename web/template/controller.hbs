@@ -26,12 +26,12 @@
 
 
     <div class="col">
-      <div class="card h-100">
+      <div class="card h-100 door_card">
         <div class="card-header">
           <h4>Dveře místnosti</h4>
         </div>
         <div class="card-body text-center">
-            <b>Otevřěno/Zavřeno</b>
+            <span id="door_val"><b>Otevřěno/Zavřeno</b></span>
         </div>
       </div>
     </div>
@@ -48,7 +48,25 @@
     </div>
 </div>
 
+
+
+
+
 <div class="card">
+    <div class="card-header">
+        Přehled běhů
+    </div>
+    <div class="card-body">
+        <div id="job_table"></div>
+        Zde jsou zobrazeny pouze mé běhy. 
+    </div>
+</div>
+
+
+
+
+
+<div class="card" id="program_step_card" style="display: none;">
     <div class="card-header">
         Aktuální program: <b><span>Název programu</span></b>
         Spustit
@@ -57,40 +75,91 @@
     <div class="card-body">
 
         <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
-          <ol class="breadcrumb">
+          <ol class="breadcrumb" id="program_steps_view">
             <li class="breadcrumb-item active">Start</li>
-            <li class="breadcrumb-item">Zářič_A (30s)</li>
-            <li class="breadcrumb-item">Zářič_B (30s)</li>
+            <li class="breadcrumb-item">... ---- ....</li>
             <li class="breadcrumb-item active">Konec</li>
           </ol>
         </nav>
 
-
-        <form id="program_step_editor" style="display: none;">
-          <div class="mb-3">
-            <label for="exampleInputEmail1" class="form-label">Krok</label>
-            <select class="form-control">
-                <option>Mezera</option>
-                <option>Zářič A</option>
-                <option>Zářič B</option>
-            </select>
-            <div id="emailHelp" class="form-text">Typ operace.</div>
+        <br>
+        <form id="program_step_editor" class="card" style="display: block;">
+        {% module xsrf_form_html() %}
+          <div class="row g-2">
+            <div class="col-auto">
+                <label for="exampleInputEmail1" class="form-label col-auto">Operace:</label>
+            </div>
+            <div class="col-auto">
+                <select class="form-control" name="step_operation">
+                    <option value = 'close'>Zavřeno</option>
+                    <option value = 'sleep'>Pauza</option>
+                    <option value = 'PosA'>Zářič A</option>
+                    <option value = 'PosB'>Zářič B</option>
+                </select>
+            </div>
+            <div class="col-auto">
+                <label for="" class="form-label text-end">Délka:</label>
+            </div>
+            <div class="col-auto">
+                <input type="number" class="form-control" id="step_length", value="50", name="step_duration" id="step_duration">
+            </div>
+            <div class="col-auto">
+                <label for="" class="form-label text-end">Pořadí:</label>
+            </div>
+            <div class="col-auto">
+                <input type="number" class="form-control" id="step_number", name="step_number", value="0", id="step_number">
+            </div>
+            <div class="col-auto">
+              <button type="submit" class="btn btn-primary">Přidat</button>
+            </div>
           </div>
-          <div class="mb-3">
-            <label for="exampleInputPassword1" class="form-label">Délka kroku</label>
-            <input type="number" class="form-control" id="step_length", value="50">
-          </div>
-          <div class="mb-3">
-            <label for="exampleInputPassword1" class="form-label">Pozice</label>
-            <input type="number" class="form-control" id="step_number", value="0">
-            <div id="step_number" class="form-text">Pozice operace v programu. Pokud chcete vložit do existujícího programu, zadejte pozici před kterou to chcete vložit</div>
-          </div>
-          <button type="submit" class="btn btn-primary">Add</button>
         </form>
+
+
+        <br><br>
+        <form id="program_metadata_editor" style="display: block;">
+        {% module xsrf_form_html() %}
+            <div class="row g-1 align-items-center">
+
+                <div class="col-auto">
+                    <label for="" class="form-label">Id: </label>
+                </div>
+                <div class="col-auto">
+                    <input type="text" class="form-control" id="id" disabled>
+                </div>
+                <div class="col-auto">
+                    <label for="" class="form-label">Název:</label>
+                </div>
+                <div class="col-auto">
+                    <input type="text" class="form-control" id="step_length">
+                </div>
+                <div class="col-auto">
+                    <label for="" class="form-label">Autor:</label>
+                </div>
+                <div class="col-auto">
+                    <input type="text" class="form-control" id="step_length" disabled>
+
+                </div>
+                <div class="col-auto">
+                    <label for="" class="form-label">Datum vytvoření:</label>
+                </div>
+                <div class="col-auto">
+                    <input type="text" class="form-control" id="step_length" disabled>
+
+                </div>
+                <div class="col-auto">
+                    <br>
+                    <button type="submit" class="btn btn-primary">Add</button>
+                </div>
+            </div>
+        </form>
+
+        <br>
+
+        <button class="btn btn-success" onclick="queue_actual_program()">Přidat program do fronty</button>
 
     </div>
 </div>
-
 
 
 <div class="card">
@@ -121,8 +190,48 @@
 
 <script>
 
+
+
+var opened_program = null;
+var opened_program_data = null;
+
     function load_progam(id){
         console.log("Load progarm", id);
+        $.ajax({
+            url: "/controller/get_program/"+id,
+            //data: data,
+            success: function(e){
+                // e = JSON.parse(e);
+                console.log(".....", e);
+                $("#program_step_card").show();
+                console.log("program data", e);
+                opened_program = e._id.$oid;
+                opened_program_data = e.job;
+                console.log("Program Data", opened_program_data);
+
+                // ukazat kroky
+                var steps_viewer = $('#program_steps_view');
+
+
+                load_step = 0;
+
+                steps_viewer.empty();
+                steps_viewer.append("<li class='breadcrumb-item active'>Start</li>");
+                for(step_i in opened_program_data){
+                    console.log("krok programu" + step_i, opened_program_data[step_i]);
+                    var step = opened_program_data[step_i];
+                    steps_viewer.append("<li class='breadcrumb-item'>" + step['operation'] + " <small class='text-muted'>(" + step['duration']+ "s)</small></li>");
+                }
+                steps_viewer.append("<li class='breadcrumb-item active'>Konec</li>");
+
+                $('#step_number').val(opened_program_data.length);
+
+            },
+            error: function(e){
+                opened_program = null;
+            }
+            //dataType: dataType
+        });
 
     }
 
@@ -134,36 +243,47 @@
             success: function(e){
                 console.log(e)
                 load_progam(e.program_id);
+                table_program.replaceData("/controller/get_programs");
             },
             //dataType: dataType
         });
     }
 
-    //define data array
-    var program_tabledata = [
-        {id:1, name:"Oli Bob", progress:12, gender:"male", rating:1, col:"red", dob:"19/02/1984", car:1},
-        {id:2, name:"Mary May", progress:1, gender:"female", rating:2, col:"blue", dob:"14/05/1982", car:true},
-        {id:3, name:"Christine Lobowski", progress:42, gender:"female", rating:0, col:"green", dob:"22/05/1982", car:"true"},
-        {id:4, name:"Brendon Philips", progress:100, gender:"male", rating:1, col:"orange", dob:"01/08/1980"},
-        {id:5, name:"Margret Marmajuke", progress:16, gender:"female", rating:5, col:"yellow", dob:"31/01/1999"},
-        {id:6, name:"Frank Harbours", progress:38, gender:"male", rating:4, col:"red", dob:"12/05/1966", car:1},
-    ];
 
-    //initialize table
-    var table = new Tabulator("#program_table", {
-        data:program_tabledata, //assign data to table
-        autoColumns:true, //create columns from data field names
-        columns:[
-            {formatter:"rownum", hozAlign:"center", width:40},
+    $('#program_step_editor').on('submit', function(e) {
+        e.preventDefault();
+        var data = {};
+        $("#program_step_editor :input").serializeArray().map(function(x){data[x.name] = x.value;});
+        console.log(data, e);
 
-            {title:"Progress", field:"progress", formatter:"progress", formatterParams:{color:["#00dd00", "orange", "rgb(255,0,0)"]}, sorter:"number", width:100},
-            {title:"Rating", field:"rating", formatter:"star", formatterParams:{stars:6}, hozAlign:"center", width:120},
-            {title:"name", field:"car", hozAlign:"center", formatter:"tickCross", width:500},
-            {title:"Col", field:"col" ,formatter:"color", width:50},
-            {title:"Line Wraping", field:"lorem" ,formatter:"textarea"},
-            {formatter:"buttonCross", width:30, hozAlign:"center"}
-            ],
+
+        $.ajax({
+            url: "/controller/edit_program/"+opened_program+'/'+data.step_number+'/',
+            data: data,
+            success: function(e){
+                load_progam(opened_program);
+            },
+            //dataType: dataType
+        });
+
     });
+
+
+    var table_program = new Tabulator("#program_table", {
+        layout:"fitColumns",
+        columns:[
+            {title:"Id", field:"_id.$oid", width:20},
+            {title:"Vytvořeno", field:"created", width: 150},
+            {title:"Název", field:"name", width: 150},
+            {title:"Autor", field:"author_name"},
+            {title:"Popis", field:"description"},
+            ],
+        rowDblClick:function(e, row){
+            console.log(row);
+            load_progam(row._row.cells[0].value);
+        },
+    });
+    table_program.replaceData("/controller/get_programs");
 
 
     source_position_msg.subscribe(function(msg) {
@@ -172,6 +292,20 @@
 
     distance_msg.subscribe(function(msg) {
       $("#distance_val").html(msg.range.toFixed(2));
+    });
+
+
+    door_msg.subscribe(function(msg) {
+      $(".door_card").removeClass(["bg-secondary", "bg-danger"]);
+      console.log(msg)
+      if(Number(msg.data)){
+        $("#door_val").html("Otevřeno");
+        $(".door_card").addClass("bg-danger");
+
+      }else{
+        $("#door_val").html("Zavřeno");
+        // $(".door_card").addClass("bg-secondary");
+      }
     });
 
 
@@ -187,6 +321,39 @@
         });
         motor_cmd.publish(msg);
     }
+
+
+
+    function queue_actual_program(){
+        $.ajax({
+            url: "/controller/queue_program/"+opened_program,
+            success: function(e){
+                console.log(e);
+            },
+        });
+    }
+
+
+
+
+
+    var table_jobs = new Tabulator("#job_table", {
+        layout:"fitColumns",
+        columns:[
+            {title:"Id", field:"_id.$oid", width:20},
+            {title:"Vytvořeno", field:"created", width: 150},
+            {title:"Stav", field:"status", width: 150},
+            {title:"Název", field:"name", width: 150},
+            {title:"Autor", field:"author_name"},
+            {title:"pin", field:"run_key"},
+            ],
+        rowDblClick:function(e, row){
+            console.log(row);
+            load_progam(row._row.cells[0].value);
+        },
+    });
+    table_jobs.replaceData("/controller/get_jobs");
+
 
 </script>
 
