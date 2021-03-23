@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en" style="height: 100%; width: 100%;">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
+    <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/static/bootstrap-icons-1.4.0/bootstrap-icons.css">
+    <script src="/static/roslib.min.js"></script>
+
+    <script src="/static/jquery-3.6.0.min.js"></script>
+    <script src="/static/bootstrap/js/bootstrap.min.js"></script>
+    <script src="/static/moment-with-locales.min.js"></script>
+
+    <meta name="theme-color" content="#7952b3">
+    <style type="text/css">
+
+
+            .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        user-select: none;
+      }
+
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
+      
+      /*
+       * Globals
+       */
+
+
+      /* Custom default button */
+      .btn-secondary,
+      .btn-secondary:hover,
+      .btn-secondary:focus {
+        color: #333;
+        text-shadow: none; /* Prevent inheritance from `body` */
+      }
+
+
+      /*
+       * Base structure
+       */
+
+      body {
+        text-shadow: 0 .05rem .1rem rgba(0, 0, 0, .5);
+        box-shadow: inset 0 0 5rem rgba(0, 0, 0, .5);
+      }
+
+      .cover-container {
+        /*max-width: 42em;*/
+      }
+
+
+      /*
+       * Header
+       */
+
+      .nav-masthead .nav-link {
+        padding: .25rem 0;
+        font-weight: 700;
+        color: rgba(255, 255, 255, .5);
+        background-color: transparent;
+        border-bottom: .25rem solid transparent;
+      }
+
+      .nav-masthead .nav-link:hover,
+      .nav-masthead .nav-link:focus {
+        border-bottom-color: rgba(255, 255, 255, .25);
+      }
+
+      .nav-masthead .nav-link + .nav-link {
+        margin-left: 1rem;
+      }
+
+      .nav-masthead .active {
+        color: #fff;
+        border-bottom-color: #fff;
+      }
+
+
+      .form-control, .form-control:disabled{
+        background-color: gray;
+        border: none;
+        padding: .1rem .4rem;
+      }
+
+
+
+    </style>
+
+
+
+    {% block head %}{% end %}
+
+
+
+</head>
+<body class="d-flex h-100 text-center text-white bg-dark">
+</div>
+
+
+
+<div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
+  <header class="mb-auto">
+    <div>
+      <h3 class="float-md-start mb-0" onClick="window.location.reload();">IRRADROOM</h3> <span class="text-muded small text-sm clock" style="color: gray;">2021-03-00 00:00:00</span>
+      <nav class="nav nav-masthead justify-content-center float-md-end">
+        <a class="nav-link active" href="#" data-bs-toggle="tab" data-bs-target="#home" role="tab" aria-controls="home" aria-selected="true">Domů</a>
+        <a class="nav-link" href="#status" data-bs-toggle="tab" data-bs-target="#status" role="tab" aria-controls="status" aria-selected="false">Status</a>
+        <a class="nav-link" href="#program" data-bs-toggle="tab" data-bs-target="#program" role="tab" aria-controls="program" aria-selected="false">Program</a>
+        <a class="nav-link" href="#about" data-bs-toggle="tab" data-bs-target="#about" role="tab" aria-controls="about" aria-selected="false">O zařízení</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="px-3">
+
+    {% block content %}{% end %}
+
+    <div class="tab-content" id="myTabContent">
+      <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+
+          System připraven
+
+          <i class="bi bi-archive"></i>
+
+      </div>
+      <div class="tab-pane fade" id="status" role="tabpanel" aria-labelledby="status-tab">
+        <div class="row row-cols-4 g-2">
+
+        <div class="col">
+        <div class="card text-white bg-secondary mb-3 prog_card">
+          <div class="card-header">
+            <b>Program</b>
+          </div>
+          <div class="card-body">
+            <span id="prog_val">---</span>
+          </div>
+        </div>
+        </div>
+
+        <div class="col">
+
+
+        <div class="card text-white bg-secondary mb-3">
+          <div class="card-header">
+            <b>Zářič</b>
+          </div>
+          <div class="card-body">
+            Zavřeno<br>
+          </div>
+        </div>
+        </div>
+
+        <div class="col">
+        <div class="card door_card text-white bg-secondary mb-3">
+          <div class="card-header">
+            <b>Dveře</b>
+          </div>
+          <div class="card-body">
+            <span id="door_val">---</span>
+          </div>
+        </div>
+        </div>
+
+        <div class="col">
+        <div class="card text-white bg-secondary mb-3">
+          <div class="card-header">
+            <b>Vzdálenost stolu</b>
+          </div>
+          <div class="card-body">
+            <i class="bi bi-arrow-bar-right"></i> <span id="distance_val">---</span> cm
+          </div>
+        </div>
+        </div>
+
+
+      </div></div>
+      <div class="tab-pane fade" id="program" role="tabpanel" aria-labelledby="program-tab">      <!-- PROGRAM --- začátek -->
+        
+        <div class="row row-cols-2 g-4 program_input_div">
+          <div class="col" style="width: initial;">
+            <h4 class="text-start"><i class="bi bi-lock"></i> Pin programu:</h4>
+            <table>
+              <tr>
+                <td colspan="3"><input type="text" name="program_run_key" id="program_run_key" class="form-control mb-2 mt-2" disabled></td>
+              </tr>
+              <tr>
+                <td><button class="btn btn-secondary btn-lg p-3 px-4" style="font-size: 130%; width: 100%" onclick="program_pin_write(1)"><b>1</b></button></td>
+                <td><button class="btn btn-secondary btn-lg p-3 px-4" style="font-size: 130%; width: 100%" onclick="program_pin_write(2)"><b>2</b></button></td>
+                <td><button class="btn btn-secondary btn-lg p-3 px-4" style="font-size: 130%; width: 100%" onclick="program_pin_write(3)"><b>3</b></button></td>
+              </tr>
+              <tr>
+                <td><button class="btn btn-secondary btn-lg p-3 px-4" style="font-size: 130%; width: 100%" onclick="program_pin_write(4)"><b>4</b></button></td>
+                <td><button class="btn btn-secondary btn-lg p-3 px-4" style="font-size: 130%; width: 100%" onclick="program_pin_write(5)"><b>5</b></button></td>
+                <td><button class="btn btn-secondary btn-lg p-3 px-4" style="font-size: 130%; width: 100%" onclick="program_pin_write(6)"><b>6</b></button></td>
+              </tr>
+              <tr>
+                <td><button class="btn btn-secondary btn-lg p-3 px-4" style="font-size: 130%; width: 100%" onclick="program_pin_write(7)"><b>7</b></button></td>
+                <td><button class="btn btn-secondary btn-lg p-3 px-4" style="font-size: 130%; width: 100%" onclick="program_pin_write(8)"><b>8</b></button></td>
+                <td><button class="btn btn-secondary btn-lg p-3 px-4" style="font-size: 130%; width: 100%" onclick="program_pin_write(9)"><b>9</b></button></td>
+              </tr>
+              <tr>
+                <td><button class="btn btn-secondary btn-lg p-3 px-4" style="font-size: 130%; width: 100%" onclick="program_pin_write(0)"><b>0</b></button></td>
+                <td><button class="btn btn-danger btn-lg p-3 px-4" style="font-size: 130%; width: 100%" onclick="program_pin_write_back()"><i class="bi bi-arrow-left-circle"></i></button></td>
+                <!-- <td><button class="btn btn-secondary btn-lg p-3 px-4" style="" onclick="program_pin_write_clear()">X</button> </td> -->
+                <td><button class="btn btn-warning btn-lg p-3 px-4" style="font-size: 130%; width: 100%" onclick="program_pin_write_done()"><i class="bi bi-play-circle"></i></button> </td>
+              </tr>
+            </table>
+          </div>
+          <div  class="col text-start program_info_div" style="display: none;">
+
+            <div class="mb-1">
+              <label class="form-label">Název programu:</label>
+              <input type="text" class="form-control" id="program_info_name" disabled>
+            </div>
+
+            <div class="mb-1">
+              <label class="form-label">Autor programu / Spustil</label>
+              <input type="text" class="form-control" id="program_info_author" disabled>
+            </div>
+
+            <!-- <div class="mb-1">
+              <label class="form-label">Spustil</label>
+              <input type="text" class="form-control" id="program_info_author_run" disabled>
+            </div> -->
+
+            <div class="mb-1">
+              <label class="form-label">Odhad délky</label>
+              <input type="text" class="form-control" id="" disabled>
+            </div>
+
+
+            <div class="mb-1">
+              <label class="form-label">Kroky</label>
+              <div id="program_info_steps" class="form-control">A (30) > B (10) > C (10) .... </div>
+            </div>
+
+            <div>
+              <button class="btn btn-warning btn-lg p-3 px-4" style="font-size: 130%; width: 100%" onclick="run_program()"><i class="bi bi-play-circle"></i></button> 
+            </div>
+
+          </div>
+        </div>
+      </div>                                                                                      <!-- Program konec -->
+      <div class="tab-pane fade" id="about" role="tabpanel" aria-labelledby="about-tab">          <!-- ABOUT --- zacatek -->
+        <div class="row row-cols-2 g-4">
+          <div class="col">
+            <h3>IRRADROOM01</h3>
+            <p>
+              Ovládací systém pro ozařovnu ODZ UJF AVČR. 
+            </p>
+            <p>
+              Návod k použití najdete na adrese v QR kódu v pravé části terminálu.
+            </p>
+            <p>
+            </p>
+
+            <img style="width: 75%;" src="/static/logo_UST_small.png"></img>
+          </div>
+          <div  class="col">
+            <img src="/static/qr_github.png"></img>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="mt-auto text-white-50">
+    Vyvinuto firmou <b>UST.cz</b> &#183; 2021
+  </footer>
+</div>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    var ros = new ROSLIB.Ros();
+
+    ros.on('connection', function() {
+      console.log('Connected to websocket server.');
+    });
+
+    ros.on('error', function(error) {
+      $('#myModal').modal('show');
+      console.log('Error connecting to websocket server: ', error);
+    });
+
+    ros.on('close', function() {
+      $('#modal').modal('show');
+      console.log('Connection to websocket server closed.');
+      alert('Connection to websocket server closed.');
+    });
+
+    ros.connect("ws://"+document.location.host+"/ws");
+
+    var source_position_msg = new ROSLIB.Topic({
+      ros : ros,
+      name : '/source_position',
+      messageType : 'sensor_msgs/Range'
+    });
+    
+    source_position_msg.subscribe(function(msg) {
+      $("#source_position_val").html(msg.range.toFixed(2));
+    });
+
+
+    var distance_msg = new ROSLIB.Topic({
+      ros : ros,
+      name : '/distance',
+      messageType : 'sensor_msgs/Range'
+    });
+    
+    distance_msg.subscribe(function(msg) {
+      $("#distance_val").html(msg.range.toFixed(2));
+    });
+
+
+    var door_msg = new ROSLIB.Topic({
+      ros : ros,
+      name : '/door_status',
+      messageType : 'std_msgs/Int8'
+    });
+    
+    door_msg.subscribe(function(msg) {
+      $(".door_card").removeClass(["bg-secondary", "bg-danger"]);
+      if(Number(msg.data)){
+        $("#door_val").html("Otevřeno <i class='bi bi-door-open'></i>");
+        $(".door_card").addClass("bg-danger");
+
+      }else{
+        $("#door_val").html("Zavřeno");
+        $(".door_card").addClass("bg-secondary <i class='bi bi-door-closed'></i>");
+      }
+    });
+
+
+    var program_status = new ROSLIB.Topic({
+      ros : ros,
+      name : '/program_status',
+      messageType : 'irradroom_cmake/msg/ProgramStatus'
+    });
+    
+    program_status.subscribe(function(msg) {
+      console.log(msg);
+      if(msg.program_status > 0){
+        $("#prog_val").html("Beží");
+        $(".prog_card").addClass("bg-success");
+      }else{
+        $("#prog_val").html("Vypnuto");
+        $(".prog_card").removeClass(["bg-success"]);
+      }
+    });
+
+
+
+
+
+
+    function program_pin_write(num){
+      $("#program_run_key").val(String($("#program_run_key").val())+String(num));
+    }
+    function program_pin_write_back(){
+      $("#program_run_key").val(String($("#program_run_key").val()).slice(0, -1));
+    }
+    function program_pin_write_clear(){
+      $("#program_run_key").val("");
+    }
+
+var program_run_key = null;
+var program_data = null;
+    function program_pin_write_done(){
+      program_run_key = $("#program_run_key").val();
+      clear_run_data();
+      $.ajax({
+            url: "/terminal/run_program_from_terminal/" + $("#program_run_key").val() + '/',
+            success: function(e){
+                console.log(e);
+                $("#program_run_key").val('');
+                $(".program_info_div").show();
+                var data = JSON.parse(e);
+                show_run_data(data);
+            },
+            error: function(e){
+                $("#program_run_key").empty()
+                console.log(e);
+            }
+        });
+    }
+
+
+function clear_run_data(){
+  $("#program_info_name").val('');
+  $("#program_info_author").val('');
+  // $("#program_info_author_run").val('');
+  $("#program_info_steps").empty();;
+}
+
+
+function show_run_data(data){
+  program_data = data;
+  $("#program_info_name").val(data.name + " (run: "+ program_run_key +")");
+  $("#program_info_author").val(data.author_name + " / " + data.run_author);
+  // $("#program_info_author_run").val(data.run_author);
+
+  steps_div = $("#program_info_steps");
+  steps_div.empty();
+  steps_div.append("Start");
+  for(i in data.job){
+    var step = data.job[i];
+    console.log(i, step);
+    steps_div.append(" > " + step.operation + "("+ step.duration + ")");
+  }
+  steps_div.append(" > Konec");
+}
+
+
+var run_program_srv = new ROSLIB.Service({
+  ros : ros,
+  name : '/run_program',
+  serviceType : 'irradroom_cmake/RunProgram'
+});
+
+
+function run_program(){
+  var request = new ROSLIB.ServiceRequest({
+    run_id: program_data._id.$oid,
+    run_key: String(program_run_key)
+  });
+
+  run_program_srv.callService(request, function(result) {
+    console.log('Result for service call on ', result);
+  });
+}
+
+
+// hodiny
+  function update_time() {
+    $('.clock').html(moment().locale("cs").format('D. MMMM YYYY H:mm:ss'));
+  }
+  setInterval(update_time, 1000);
+  
+
+
+  </script>
+
+
+</body>
+</html>
