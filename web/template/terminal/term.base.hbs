@@ -184,7 +184,7 @@
       </div></div>
       <div class="tab-pane fade" id="program" role="tabpanel" aria-labelledby="program-tab">      <!-- PROGRAM --- začátek -->
         
-        <div class="row row-cols-2 g-4 program_input_div">
+        <div class="row row-cols-3 g-4 program_input_div">
           <div class="col" style="width: initial;">
             <h4 class="text-start"><i class="bi bi-lock"></i> Pin programu:</h4>
             <table>
@@ -214,6 +214,13 @@
               </tr>
             </table>
           </div>
+
+          <div  class="col text-start" id="program_info_bad" style="display: none;">
+            <h4> </h4>
+            <div class="card bg-danger">
+              <div class="card-body"> Tento pin nebyl nalezen. Zkontrolujte jeho správnost a existenci ve webovém rozhraní. </div>
+            </div>
+          </div>
           <div  class="col text-start program_info_div" style="display: none;">
 
             <div class="mb-1">
@@ -233,7 +240,7 @@
 
             <div class="mb-1">
               <label class="form-label">Odhad délky</label>
-              <input type="text" class="form-control" id="" disabled>
+              <input type="text" class="form-control" id="program_info_duration" disabled>
             </div>
 
 
@@ -243,7 +250,21 @@
             </div>
 
             <div>
-              <button class="btn btn-warning btn-lg p-3 px-4" style="font-size: 130%; width: 100%" onclick="run_program()"><i class="bi bi-play-circle"></i></button> 
+              <button class="btn btn-success btn-lg p-3 px-4" style="font-size: 130%; width: 100%" onclick="run_program()"><i class="bi bi-play-circle"></i></button> 
+            </div>
+
+          </div>
+          <div  class="col text-start program_info_div" style="display: none;">
+
+            <div class="mb-1 bg-primary h-80 w-100">
+            </div>
+
+            <div class="progress">
+              <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+
+            <div>
+              <button class="btn btn-danger btn-lg p-3 px-4" style="font-size: 130%; width: 100%" onclick="stop_program()"><i class="bi bi-stop-circle-fill"></i></button> 
             </div>
 
           </div>
@@ -351,7 +372,6 @@
     });
     
     program_status.subscribe(function(msg) {
-      console.log(msg);
       if(msg.program_status > 0){
         $("#prog_val").html("Beží");
         $(".prog_card").addClass("bg-success");
@@ -380,15 +400,25 @@ var program_run_key = null;
 var program_data = null;
     function program_pin_write_done(){
       program_run_key = $("#program_run_key").val();
+
+      $("#program_info_bad").hide();
+      $(".program_info_div").hide();
+
       clear_run_data();
       $.ajax({
             url: "/terminal/run_program_from_terminal/" + $("#program_run_key").val() + '/',
             success: function(e){
                 console.log(e);
                 $("#program_run_key").val('');
-                $(".program_info_div").show();
                 var data = JSON.parse(e);
-                show_run_data(data);
+
+                if(!Array.isArray(data)){
+                  show_run_data(data);
+                  $(".program_info_div").show();
+                }else{
+                  $(".program_info_div").hide();
+                  $("#program_info_bad").show();
+                }
             },
             error: function(e){
                 $("#program_run_key").empty()
@@ -402,7 +432,7 @@ function clear_run_data(){
   $("#program_info_name").val('');
   $("#program_info_author").val('');
   // $("#program_info_author_run").val('');
-  $("#program_info_steps").empty();;
+  $("#program_info_steps").empty();
 }
 
 
@@ -412,6 +442,7 @@ function show_run_data(data){
   $("#program_info_author").val(data.author_name + " / " + data.run_author);
   // $("#program_info_author_run").val(data.run_author);
 
+  duration_total = 0;
   steps_div = $("#program_info_steps");
   steps_div.empty();
   steps_div.append("Start");
@@ -419,8 +450,10 @@ function show_run_data(data){
     var step = data.job[i];
     console.log(i, step);
     steps_div.append(" > " + step.operation + "("+ step.duration + ")");
+    duration_total += Number(step['duration']);
   }
   steps_div.append(" > Konec");
+  $("#program_info_duration").val(String(duration_total) + " s");    
 }
 
 

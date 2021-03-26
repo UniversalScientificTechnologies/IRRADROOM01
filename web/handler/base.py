@@ -98,6 +98,17 @@ class Controller_get_jobs(BaseHandler):
         print(jobs)
         self.write(dumps(jobs))
 
+class Controller_remove_program_step(BaseHandler):
+    def get(self, program, step):
+
+        program_id = bson.ObjectId(program)
+        mdb = pymongo.MongoClient("mongodb://localhost:27017/").IRRADROOM
+
+        mdb.programs.update({'_id': program_id}, {"$unset" : {"job."+step : 1 }})
+        mdb.programs.update({'_id': program_id}, {"$pull" : {"job" : None}})
+
+        self.write("removed")
+
 
 class Controller_get_program(BaseHandler):
     def get(self, prog_id):

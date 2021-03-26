@@ -68,9 +68,7 @@
 
 <div class="card" id="program_step_card" style="display: none;">
     <div class="card-header">
-        Aktuální program: <b><span>Název programu</span></b>
-        Spustit
-        Zavřít program
+        Aktuální program: <b><span id="program_name_card">Název programu</span></b>
     </div>
     <div class="card-body">
 
@@ -125,31 +123,30 @@
                     <label for="" class="form-label">Id: </label>
                 </div>
                 <div class="col-auto">
-                    <input type="text" class="form-control" id="id" disabled>
+                    <input type="text" class="form-control" id="program_id" disabled>
                 </div>
                 <div class="col-auto">
                     <label for="" class="form-label">Název:</label>
                 </div>
                 <div class="col-auto">
-                    <input type="text" class="form-control" id="step_length">
+                    <input type="text" class="form-control" id="program_name">
                 </div>
                 <div class="col-auto">
                     <label for="" class="form-label">Autor:</label>
                 </div>
                 <div class="col-auto">
-                    <input type="text" class="form-control" id="step_length" disabled>
+                    <input type="text" class="form-control" id="program_author" disabled>
 
                 </div>
-                <div class="col-auto">
+                <!-- <div class="col-auto">
                     <label for="" class="form-label">Datum vytvoření:</label>
                 </div>
                 <div class="col-auto">
                     <input type="text" class="form-control" id="step_length" disabled>
-
-                </div>
+                </div> -->
                 <div class="col-auto">
                     <br>
-                    <button type="submit" class="btn btn-primary">Add</button>
+                    <button type="submit" class="btn btn-primary">Uložit</button>
                 </div>
             </div>
         </form>
@@ -164,12 +161,12 @@
 
 <div class="card">
     <div class="card-header">
-        Přehled programů
+        Programy ozařovny
     </div>
     <div class="card-body">
-        Tady bude tabulka s programy
-        <button onclick="NewProgram()">Vytvořit nový program</button>
         <div id="program_table"></div>
+        <br>
+            <button class="btn btn-primary" onclick="NewProgram()">Vytvořit nový program</button>
     </div>
 </div>
 
@@ -195,6 +192,15 @@
 var opened_program = null;
 var opened_program_data = null;
 
+    function remove_program_step(step){
+        $.ajax({
+            url: "/controller/remove_program_step/"+opened_program+"/"+step+"/",
+            success: function(e){
+                load_progam(opened_program);
+            }
+        });
+    }
+
     function load_progam(id){
         console.log("Load progarm", id);
         $.ajax({
@@ -213,18 +219,26 @@ var opened_program_data = null;
                 var steps_viewer = $('#program_steps_view');
 
 
+
                 load_step = 0;
+                duration_total = 0;
 
                 steps_viewer.empty();
-                steps_viewer.append("<li class='breadcrumb-item active'>Start</li>");
-                for(step_i in opened_program_data){
+                steps_viewer.append("<li class='breadcrumb-item active btn' disabled>Start</li>");
+                for(step_i in opened_program_data) if(opened_program_data[step_i]){
                     console.log("krok programu" + step_i, opened_program_data[step_i]);
                     var step = opened_program_data[step_i];
-                    steps_viewer.append("<li class='breadcrumb-item'>" + step['operation'] + " <small class='text-muted'>(" + step['duration']+ "s)</small></li>");
+                    steps_viewer.append("<li class='breadcrumb-item btn' onclick='remove_program_step("+step_i+")'>" + step['operation'] + " <small class='text-muted'>(" + step['duration']+ "s)</small></li>");
+                    duration_total += Number(step['duration']);
                 }
-                steps_viewer.append("<li class='breadcrumb-item active'>Konec</li>");
+                steps_viewer.append("<li class='breadcrumb-item active btn' disabled>Konec</li>");
 
+
+                $("#program_id").val(opened_program);
                 $('#step_number').val(opened_program_data.length);
+                $('#program_name').val(e.name);
+                $('#program_name_card').val(e.name);
+                $('#program_author').val(e.author_name);
 
             },
             error: function(e){
