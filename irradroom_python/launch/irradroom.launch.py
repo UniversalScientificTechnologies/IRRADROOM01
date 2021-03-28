@@ -17,11 +17,18 @@ def generate_launch_description():
         ),
         Node(
             package='irradroom_python',
+            executable='door',
+        ),
+        Node(
+            package='irradroom_python',
             executable='i2c_devices',
         ),
         Node(
             package='irradroom_python',
             executable='controller',
+        ),
+        Node(
+            executable='python3 /root/dev_ws/IRRADROOM01/web/web.py',
         )
         ])
 

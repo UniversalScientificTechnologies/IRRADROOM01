@@ -27,7 +27,8 @@ setup(
             'i2c_devices = irradroom_python.i2c_devices:main',
             'source_position = irradroom_python.source_position:main',
             'controller = irradroom_python.controller:main',
-            'door = irradroom_python.door_status:main'
+            'door = irradroom_python.door_status:main',
+            'web = irradroom_python.web.web:main'
         ],
     },
 )
