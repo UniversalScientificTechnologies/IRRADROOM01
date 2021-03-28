@@ -90,6 +90,8 @@ V poslední záložce terminálu uživatel nalezne popis terminálu a QR kód s 
 * `export ROS_DOMAIN_ID=35`
 * Install `rosbridge_server` (from git; branch `ros2`)
 
+### Schéma zařízení
+![Schéma zařízení](https://github.com/UniversalScientificTechnologies/IRRADROOM01/blob/IRRADROOM01A/doc/irradroom_schema.png)
 
 #### ROS 2
 Jako základní framework je použit ROS2. Domain ID je nastaveno na 35 v `~/.bashrc`.
