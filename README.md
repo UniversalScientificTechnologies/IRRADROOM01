@@ -71,7 +71,7 @@ V pravém sloupci pak vidíte samotý průběh programu.
 ![terminalu](https://github.com/UniversalScientificTechnologies/IRRADROOM01/blob/IRRADROOM01A/doc/terminal_program_3.png)
 
 ### O zařízení
-
+V poslední záložce terminálu uživatel nalezne popis terminálu a QR kód s odkazem a tento návod. 
 
 
 
