@@ -25,7 +25,14 @@ Systém funguje tak, že uživatel si ve webovém prostředí přípraví progra
 
 
 ### Tvorba nových užívatelů. 
+Tvorba nových uživatelů se neprovádí přes webové rozhraní. Pro tento účel existuje python skript, který vytvoří nového uživatele. Pokud uživatel již existuje, bude provedena jeho aktualizace. Skript se spouští příkazem `python3 update_user.py`. 
 
+```bash
+# python3 update_user.py
+usage: update_user.py [-h] --login LOGIN --passw PASSW --name NAME
+```
+
+_Aby vaše heslo nezůstalo v historii bashe, před příkaz vložte ` ` (mezeru)._
 
 
 ## Terminál
@@ -75,7 +82,7 @@ V poslední záložce terminálu uživatel nalezne popis terminálu a QR kód s 
 
 
 
-## Tenchniké detaily
+## Technické detaily
 ### Řidící počítač
 
 * Odroid C2
