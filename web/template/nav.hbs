@@ -16,7 +16,7 @@
             <li><a style="color: #888;" data-bs-toggle="modal" data-bs-target="#modal-setting">Nastavení</a></li>
             {% end %}
 
-            <li><a style="color: #888;" href="/logout">Odhlásit se: <b>{{current_user['login']}}</b></a></li>
+            <li><a style="color: #888;" href="/logout">Odhlásit se: <b>{{current_user['user']}}</b></a></li>
         {% else %}
             <li><a style="color: #777;" data-bs-toggle="modal" data-bs-target="#modal-login">Přihlášení</a></li>
 

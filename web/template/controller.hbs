@@ -52,7 +52,7 @@
 
 
 
-<div class="card">
+<div class="card my-3">
     <div class="card-header">
         Přehled běhů
     </div>
@@ -66,7 +66,7 @@
 
 
 
-<div class="card" id="program_step_card" style="display: none;">
+<div class="card my-3" id="program_step_card" style="display: none;">
     <div class="card-header">
         Aktuální program: <b><span id="program_name_card">Název programu</span></b>
     </div>
@@ -80,7 +80,6 @@
           </ol>
         </nav>
 
-        <br>
         <form id="program_step_editor" class="card" style="display: block;">
         {% module xsrf_form_html() %}
           <div class="row g-2">
@@ -113,8 +112,6 @@
           </div>
         </form>
 
-
-        <br><br>
         <form id="program_metadata_editor" style="display: block;">
         {% module xsrf_form_html() %}
             <div class="row g-1 align-items-center">
@@ -151,28 +148,26 @@
             </div>
         </form>
 
-        <br>
-
         <button class="btn btn-success" onclick="queue_actual_program()">Přidat program do fronty</button>
 
     </div>
 </div>
 
 
-<div class="card">
-    <div class="card-header">
-        Programy ozařovny
+<div class="card my-3">
+    <div class="card-header d-flex">
+        <h5 class="">Programy ozařovny</h5>
+        <button class="ms-auto btn btn-primary btn-sm" onclick="NewProgram()">Vytvořit nový program</button>
     </div>
     <div class="card-body">
         <div id="program_table"></div>
-        <br>
-            <button class="btn btn-primary" onclick="NewProgram()">Vytvořit nový program</button>
+            
     </div>
 </div>
 
 
 
-<div class="card">
+<div class="card my-3">
     <div class="card-header">
         Přehled měření
     </div>
@@ -186,8 +181,6 @@
 
 
 <script>
-
-
 
 var opened_program = null;
 var opened_program_data = null;
@@ -289,8 +282,22 @@ var opened_program_data = null;
             {title:"Id", field:"_id.$oid", width:20},
             {title:"Vytvořeno", field:"created", width: 150},
             {title:"Název", field:"name", width: 150},
-            {title:"Autor", field:"author_name"},
-            {title:"Popis", field:"description"},
+            {title:"Autor", field:"author_name", width: 100},
+            {title:"Postup", field:"job", formatter:function(cell, formatterParams){
+                var value = cell.getValue();
+                //console.log(value);
+                text = ""
+                length = 0
+                for(i in value){
+                    var v = value[i];
+                    if(i > 0){text += " > "}
+                    text += v['operation']
+                    length += Number(v['duration'])
+                }
+                
+                return text + " ("+length+" s)";
+                
+            }},
             ],
         rowDblClick:function(e, row){
             console.log(row);
@@ -355,11 +362,27 @@ var opened_program_data = null;
         layout:"fitColumns",
         columns:[
             {title:"Id", field:"_id.$oid", width:20},
-            {title:"Vytvořeno", field:"created", width: 150},
-            {title:"Stav", field:"status", width: 150},
+            {title:"Vytvořeno", field:"added", width: 150},
+            {title:"Stav", field:"status", width: 100},
+            {title:"Postup", field:"job", formatter:function(cell, formatterParams){
+                var value = cell.getValue();
+                //console.log(value);
+                text = ""
+                length = 0
+                for(i in value){
+                    var v = value[i];
+                    if(i > 0){text += " > "}
+                    text += v['operation']
+                    length += Number(v['duration'])
+                }
+                
+                return text + " ("+length+" s)";
+                
+            }},
             {title:"Název", field:"name", width: 150},
             {title:"Autor", field:"author_name"},
-            {title:"pin", field:"run_key"},
+            {title:"Spustil", field:"run_author"},
+            {title:"pin", field:"run_key", width: 55},
             ],
         rowDblClick:function(e, row){
             console.log(row);

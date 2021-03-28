@@ -48,23 +48,21 @@ def dict_factory(cursor, row):
 
 class BaseHandler(tornado.web.RequestHandler):
     def get_current_user(self):
-
-        user_file = '/root/users.json'
-
-        #if not os.path.exists(user_file):
-        #    print "Missing user.json (%s)" %(user_file)
-        #    sys.exit()
-
         user_json = self.get_secure_cookie("user")
-        with open(user_file) as data_file:
-            users = json.load(data_file)
-
+        print("Prihlasen", user_json)
+        
         if user_json:
-            return users[eval(user_json)]
-        else:
-            return None
+            users = list(self.mdb.users.find({"user": user_json.decode("utf-8") }))
+
+            if len(users) > 0:
+                return users[0]     
+
+        return None
+
 
     def initialize(self):
+        self.mdb = pymongo.MongoClient("mongodb://localhost:27017/").IRRADROOM
+        
         #self.config = self.settings['']
         #self.db = self.settings['']
         pass
@@ -81,7 +79,7 @@ class Controller_get_programs(BaseHandler):
     def get(self):
 
         mdb = pymongo.MongoClient("mongodb://localhost:27017/").IRRADROOM
-        programs = mdb.programs.find({})
+        programs = mdb.programs.find({}).sort([('_id', -1)])
         programs = list(programs)
 
         print(programs)
@@ -92,7 +90,7 @@ class Controller_get_jobs(BaseHandler):
     def get(self):
 
         mdb = pymongo.MongoClient("mongodb://localhost:27017/").IRRADROOM
-        jobs = mdb.runs.find({}) #TODO: filtrovat podle autora, seradit podle stavu a podle data
+        jobs = mdb.runs.find({'run_author': self.current_user.get('user')}).sort([('_id', -1)])
         jobs = list(jobs)
 
         print(jobs)
@@ -128,17 +126,17 @@ class Controller_queue_program(BaseHandler):
     def get(self, prog_id):
         self.set_header("Content-Type", "application/json")
 
-
         mdb = pymongo.MongoClient("mongodb://localhost:27017/").IRRADROOM
         program = mdb.programs.find({'_id': bson.ObjectId(prog_id)})
         
         program = list(program)[0]
         program['_id'] = bson.ObjectId()
         program['run_key'] = random.randint(1000,9999)
-        program['added'] = datetime.datetime.now()
+        program['added'] = datetime.datetime.now().strftime("%Y/%m/%d, %H:%M:%S")
         program['state'] = 0
+        program['status'] = 'new'
         program['job_recod'] = []
-        program['run_author'] = ''
+        program['run_author'] = self.current_user.get('user')
 
         print(program)
         print(program['job'])
@@ -156,10 +154,10 @@ class Controller_create_program(BaseHandler):
             '_id': pid,
             'job': [],
             'description': '',
-            'created': time.time(),
+            'created': datetime.datetime.now().strftime("%Y/%m/%d, %H:%M:%S"),
             'name': 'Nový program',
-            'author_system': self.current_user.get('login'),
-            'author_name': self.current_user.get('login')
+            'author_system': self.current_user.get('user'),
+            'author_name': self.current_user.get('user')
         }
 
         mdb = pymongo.MongoClient("mongodb://localhost:27017/").IRRADROOM
@@ -258,16 +256,18 @@ class LoginHandler(BaseHandler):
         username = self.get_argument("username", "")
         password = self.get_argument("password", "")
 
-        with open('/root/users.json') as data_file:
-            users = json.load(data_file)
+        # with open('/root/users.json') as data_file:
+        #     users = json.load(data_file)
+
+        users = list(self.mdb.users.find({"user": username}))
 
         print(username)
         print(users)
 
-        if username in users:
+        if len(users) == 1:
             print("tento uzivatel existuje")
-            print(users[username])
-            if users[username]['pass'] == hashlib.md5(password.encode()).hexdigest():
+            user = users[0]
+            if user['pass'] == hashlib.md5(password.encode()).hexdigest():
                 self.set_current_user(username)
                 self.redirect(self.get_argument("next", u"/"))
             else:
@@ -279,7 +279,7 @@ class LoginHandler(BaseHandler):
 
     def set_current_user(self, user):
         if user:
-            self.set_secure_cookie("user", tornado.escape.json_encode(user))
+            self.set_secure_cookie("user", str(user))
         else:
             self.clear_cookie("user")
 

@@ -14,8 +14,24 @@
     <meta name="theme-color" content="#7952b3">
     <style type="text/css">
 
+.danger_body {
+  background-color: black !important;
+  animation: gradient 5s ease infinite;
+}
 
-            .bd-placeholder-img {
+@keyframes gradient {
+  0% {
+    background-color: #212529;
+  }
+  50% {
+    background-color: #822525;
+  }
+  100% {
+    background-color: #212529;
+  }
+}
+
+      .bd-placeholder-img {
         font-size: 1.125rem;
         text-anchor: middle;
         -webkit-user-select: none;
@@ -94,14 +110,18 @@
 
     </style>
 
+<script type="text/javascript">
+  
+  var last_program_status = null;
 
+</script>
 
     {% block head %}{% end %}
 
 
 
 </head>
-<body class="d-flex h-100 text-center text-white bg-dark">
+<body class="d-flex h-100 text-center text-white" style="background-color: #212529;">
 </div>
 
 
@@ -109,10 +129,9 @@
 <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
   <header class="mb-auto">
     <div>
-      <h3 class="float-md-start mb-0" onClick="window.location.reload();">IRRADROOM</h3> <span class="text-muded small text-sm clock" style="color: gray;">2021-03-00 00:00:00</span>
+      <h3 class="float-md-start mb-0" onClick="window.location.reload();">IRRADROOM <i class="bi bi-circle" id="connection_icon"></i></h3> <span class="text-muded small text-sm clock" style="color: gray;">2021-03-00 00:00:00</span>
       <nav class="nav nav-masthead justify-content-center float-md-end">
         <a class="nav-link active" href="#" data-bs-toggle="tab" data-bs-target="#home" role="tab" aria-controls="home" aria-selected="true">Domů</a>
-        <a class="nav-link" href="#status" data-bs-toggle="tab" data-bs-target="#status" role="tab" aria-controls="status" aria-selected="false">Status</a>
         <a class="nav-link" href="#program" data-bs-toggle="tab" data-bs-target="#program" role="tab" aria-controls="program" aria-selected="false">Program</a>
         <a class="nav-link" href="#about" data-bs-toggle="tab" data-bs-target="#about" role="tab" aria-controls="about" aria-selected="false">O zařízení</a>
       </nav>
@@ -125,60 +144,52 @@
 
     <div class="tab-content" id="myTabContent">
       <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-
-          System připraven
-
-          <i class="bi bi-archive"></i>
-
-      </div>
-      <div class="tab-pane fade" id="status" role="tabpanel" aria-labelledby="status-tab">
         <div class="row row-cols-4 g-2">
 
         <div class="col">
-        <div class="card text-white bg-secondary mb-3 prog_card">
-          <div class="card-header">
-            <b>Program</b>
+          <div class="card text-white bg-secondary mb-3 prog_card">
+            <div class="card-header">
+              <b>Program</b>
+            </div>
+            <div class="card-body">
+              <span id="prog_val">---</span>
+            </div>
           </div>
-          <div class="card-body">
-            <span id="prog_val">---</span>
-          </div>
-        </div>
         </div>
 
         <div class="col">
-
-
-        <div class="card text-white bg-secondary mb-3">
-          <div class="card-header">
-            <b>Zářič</b>
+          <div class="card text-white bg-secondary mb-3">
+            <div class="card-header">
+              <b>Zářič</b>
+            </div>
+            <div class="card-body">
+              Zavřeno<br>
+            </div>
           </div>
-          <div class="card-body">
-            Zavřeno<br>
-          </div>
-        </div>
         </div>
 
         <div class="col">
-        <div class="card door_card text-white bg-secondary mb-3">
-          <div class="card-header">
-            <b>Dveře</b>
+          <div class="card door_card text-white bg-secondary mb-3">
+            <div class="card-header">
+              <b>Dveře</b>
+            </div>
+            <div class="card-body">
+              <span id="door_val">---</span>
+            </div>
           </div>
-          <div class="card-body">
-            <span id="door_val">---</span>
-          </div>
-        </div>
         </div>
 
         <div class="col">
-        <div class="card text-white bg-secondary mb-3">
-          <div class="card-header">
-            <b>Vzdálenost stolu</b>
-          </div>
-          <div class="card-body">
-            <i class="bi bi-arrow-bar-right"></i> <span id="distance_val">---</span> cm
+          <div class="card text-white bg-secondary mb-3">
+            <div class="card-header">
+              <b>Vzdálenost stolu</b>
+            </div>
+            <div class="card-body"><span id="distance_val">---</span> cm
+            </div>
           </div>
         </div>
-        </div>
+
+
 
 
       </div></div>
@@ -192,81 +203,108 @@
                 <td colspan="3"><input type="text" name="program_run_key" id="program_run_key" class="form-control mb-2 mt-2" disabled></td>
               </tr>
               <tr>
-                <td><button class="btn btn-secondary btn-lg p-3 px-4" style="font-size: 130%; width: 100%" onclick="program_pin_write(1)"><b>1</b></button></td>
-                <td><button class="btn btn-secondary btn-lg p-3 px-4" style="font-size: 130%; width: 100%" onclick="program_pin_write(2)"><b>2</b></button></td>
-                <td><button class="btn btn-secondary btn-lg p-3 px-4" style="font-size: 130%; width: 100%" onclick="program_pin_write(3)"><b>3</b></button></td>
+                <td><button class="btn pin_buttons btn-secondary btn-lg p-3 px-4" style="font-size: 130%; width: 100%" onclick="program_pin_write(1)"><b>1</b></button></td>
+                <td><button class="btn pin_buttons btn-secondary btn-lg p-3 px-4" style="font-size: 130%; width: 100%" onclick="program_pin_write(2)"><b>2</b></button></td>
+                <td><button class="btn pin_buttons btn-secondary btn-lg p-3 px-4" style="font-size: 130%; width: 100%" onclick="program_pin_write(3)"><b>3</b></button></td>
               </tr>
               <tr>
-                <td><button class="btn btn-secondary btn-lg p-3 px-4" style="font-size: 130%; width: 100%" onclick="program_pin_write(4)"><b>4</b></button></td>
-                <td><button class="btn btn-secondary btn-lg p-3 px-4" style="font-size: 130%; width: 100%" onclick="program_pin_write(5)"><b>5</b></button></td>
-                <td><button class="btn btn-secondary btn-lg p-3 px-4" style="font-size: 130%; width: 100%" onclick="program_pin_write(6)"><b>6</b></button></td>
+                <td><button class="btn pin_buttons btn-secondary btn-lg p-3 px-4" style="font-size: 130%; width: 100%" onclick="program_pin_write(4)"><b>4</b></button></td>
+                <td><button class="btn pin_buttons btn-secondary btn-lg p-3 px-4" style="font-size: 130%; width: 100%" onclick="program_pin_write(5)"><b>5</b></button></td>
+                <td><button class="btn pin_buttons btn-secondary btn-lg p-3 px-4" style="font-size: 130%; width: 100%" onclick="program_pin_write(6)"><b>6</b></button></td>
               </tr>
               <tr>
-                <td><button class="btn btn-secondary btn-lg p-3 px-4" style="font-size: 130%; width: 100%" onclick="program_pin_write(7)"><b>7</b></button></td>
-                <td><button class="btn btn-secondary btn-lg p-3 px-4" style="font-size: 130%; width: 100%" onclick="program_pin_write(8)"><b>8</b></button></td>
-                <td><button class="btn btn-secondary btn-lg p-3 px-4" style="font-size: 130%; width: 100%" onclick="program_pin_write(9)"><b>9</b></button></td>
+                <td><button class="btn pin_buttons btn-secondary btn-lg p-3 px-4" style="font-size: 130%; width: 100%" onclick="program_pin_write(7)"><b>7</b></button></td>
+                <td><button class="btn pin_buttons btn-secondary btn-lg p-3 px-4" style="font-size: 130%; width: 100%" onclick="program_pin_write(8)"><b>8</b></button></td>
+                <td><button class="btn pin_buttons btn-secondary btn-lg p-3 px-4" style="font-size: 130%; width: 100%" onclick="program_pin_write(9)"><b>9</b></button></td>
               </tr>
               <tr>
-                <td><button class="btn btn-secondary btn-lg p-3 px-4" style="font-size: 130%; width: 100%" onclick="program_pin_write(0)"><b>0</b></button></td>
-                <td><button class="btn btn-danger btn-lg p-3 px-4" style="font-size: 130%; width: 100%" onclick="program_pin_write_back()"><i class="bi bi-arrow-left-circle"></i></button></td>
+                <td><button class="btn pin_buttons btn-secondary btn-lg p-3 px-4" style="font-size: 130%; width: 100%" onclick="program_pin_write(0)"><b>0</b></button></td>
+                <td><button class="btn pin_buttons btn-danger btn-lg p-3 px-4" style="font-size: 130%; width: 100%" onclick="program_pin_write_back()"><i class="bi bi-arrow-left-circle"></i></button></td>
                 <!-- <td><button class="btn btn-secondary btn-lg p-3 px-4" style="" onclick="program_pin_write_clear()">X</button> </td> -->
-                <td><button class="btn btn-warning btn-lg p-3 px-4" style="font-size: 130%; width: 100%" onclick="program_pin_write_done()"><i class="bi bi-play-circle"></i></button> </td>
+                <td><button class="btn pin_buttons btn-success btn-lg p-3 px-4" style="font-size: 130%; width: 100%" onclick="program_pin_write_done()"><i class="bi bi-play-circle"></i></button> </td>
               </tr>
             </table>
           </div>
 
-          <div  class="col text-start" id="program_info_bad" style="display: none;">
-            <h4> </h4>
-            <div class="card bg-danger">
-              <div class="card-body"> Tento pin nebyl nalezen. Zkontrolujte jeho správnost a existenci ve webovém rozhraní. </div>
+
+
+
+
+
+          <div class="col text-start">  <!-- Sloupec DVA -->
+
+
+            <div  class="col text-start" id="program_info_bad" style="display: none;">
+              <div class="card bg-danger">
+                <div class="card-body"> Tento pin nebyl nalezen. Zkontrolujte jeho správnost a existenci ve webovém rozhraní. </div>
+              </div>
             </div>
+
+            <div class="program_info_div"  style="display: none; overflow: scroll;"> 
+
+              <div class="mb-1">
+                <label class="form-label">Název programu:</label>
+                <input type="text" class="form-control" id="program_info_name" disabled>
+              </div>
+
+              <div class="mb-1">
+                <label class="form-label">Autor programu / Spustil</label>
+                <input type="text" class="form-control" id="program_info_author" disabled>
+              </div>
+
+              <!-- <div class="mb-1">
+                <label class="form-label">Spustil</label>
+                <input type="text" class="form-control" id="program_info_author_run" disabled>
+              </div> -->
+
+              <div class="mb-1">
+                <label class="form-label">Odhad délky</label>
+                <input type="text" class="form-control" id="program_info_duration" disabled>
+              </div>
+
+
+              <div class="mb-1">
+                <label class="form-label">Kroky</label>
+                <div id="program_info_steps" class="form-control"></div>
+              </div>
+
+              <div>
+                <button class="btn btn-success btn-lg p-3 px-4" style="font-size: 130%; width: 100%" onclick="run_program()"><i class="bi bi-play-circle"></i> Spustit program </button> 
+              </div>
+            </div>
+
+            <div id="program_steps_div" style="display: none">
+            <h4>Program:</h4>
+            <b id="program_steps_name"></b>
+            <ol id="program_steps_ol">
+            </ol>
+            </div>
+
           </div>
-          <div  class="col text-start program_info_div" style="display: none;">
+          <div  class="col text-start position-relative">
 
-            <div class="mb-1">
-              <label class="form-label">Název programu:</label>
-              <input type="text" class="form-control" id="program_info_name" disabled>
+            <div class="position-absolute bottom-0 w-100">
+              <button class="btn btn-danger btn-lg p-3 px-4" style="font-size: 130%; width: 100%" onclick="stop_program()"><i class="bi bi-stop-circle-fill"></i> Stop</button> 
             </div>
+            <div class="program_status_div">
+              <div class="mb-1 bg-primary h-80 w-100">
+              </div>
 
-            <div class="mb-1">
-              <label class="form-label">Autor programu / Spustil</label>
-              <input type="text" class="form-control" id="program_info_author" disabled>
+              <div>
+                <h4>Program je spuštěn</h4>
+                <br>
+                <div class="d-flex justify-content-center">
+                  <div class="spinner-border" role="status">
+                    <span class="visually-hidden"></span>
+                  </div>
+                </div>
+                <br>
+                <br>
+                Krok <span class="current_job_step"></span><br>
+                <span class="current_job_msg"></span><br>
+                Čas běhu: <span class="current_job_time"></span> s / <span class="current_job_total_time"></span> s (odhad)<br>
+              </div>
             </div>
-
-            <!-- <div class="mb-1">
-              <label class="form-label">Spustil</label>
-              <input type="text" class="form-control" id="program_info_author_run" disabled>
-            </div> -->
-
-            <div class="mb-1">
-              <label class="form-label">Odhad délky</label>
-              <input type="text" class="form-control" id="program_info_duration" disabled>
-            </div>
-
-
-            <div class="mb-1">
-              <label class="form-label">Kroky</label>
-              <div id="program_info_steps" class="form-control">A (30) > B (10) > C (10) .... </div>
-            </div>
-
-            <div>
-              <button class="btn btn-success btn-lg p-3 px-4" style="font-size: 130%; width: 100%" onclick="run_program()"><i class="bi bi-play-circle"></i></button> 
-            </div>
-
-          </div>
-          <div  class="col text-start program_info_div" style="display: none;">
-
-            <div class="mb-1 bg-primary h-80 w-100">
-            </div>
-
-            <div class="progress">
-              <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-            </div>
-
-            <div>
-              <button class="btn btn-danger btn-lg p-3 px-4" style="font-size: 130%; width: 100%" onclick="stop_program()"><i class="bi bi-stop-circle-fill"></i></button> 
-            </div>
-
           </div>
         </div>
       </div>                                                                                      <!-- Program konec -->
@@ -300,26 +338,25 @@
 
 
 
-
-
-
-
   <script type="text/javascript">
     var ros = new ROSLIB.Ros();
 
     ros.on('connection', function() {
       console.log('Connected to websocket server.');
+      $("#connection_icon").removeClass(['bi-circle', 'bi-x-circle', 'bi-check2-circle']);
+      $("#connection_icon").addClass('bi-check2-circle');
     });
 
     ros.on('error', function(error) {
-      $('#myModal').modal('show');
       console.log('Error connecting to websocket server: ', error);
+      $("#connection_icon").removeClass(['bi-circle', 'bi-x-circle', 'bi-check2-circle']);
+      $("#connection_icon").addClass('bi-x-circle');
     });
 
     ros.on('close', function() {
-      $('#modal').modal('show');
       console.log('Connection to websocket server closed.');
-      alert('Connection to websocket server closed.');
+      $("#connection_icon").removeClass(['bi-circle', 'bi-x-circle', 'bi-check2-circle']);
+      $("#connection_icon").addClass('bi-x-circle');
     });
 
     ros.connect("ws://"+document.location.host+"/ws");
@@ -372,12 +409,47 @@
     });
     
     program_status.subscribe(function(msg) {
+      //console.log(msg)
+
+      // Pri zmene statusu  
+      if(last_program_status != msg.program_status){
+        last_program_status = msg.program_status;
+
+        if(msg.program_status > 0){
+          console.log("Program je spusten");
+
+            $(".prog_card").addClass("bg-success");
+            $('.program_info_div').hide();
+            $('#program_steps_div').show();
+            $('.pin_buttons').attr('disabled', 'true');
+            $('.program_status_div').show();
+
+        } else {
+        // Pri ukonceni programu
+
+            $("#prog_val").html("Vypnuto");
+            $(".prog_card").removeClass(["bg-success"]);
+
+            $('.pin_buttons').removeAttr('disabled');   // Zapnout tlacitka
+            $('.program_status_div').hide();            // Schovat status programu
+            $("#program_steps_div").hide();
+
+        }
+      }
+
       if(msg.program_status > 0){
-        $("#prog_val").html("Beží");
-        $(".prog_card").addClass("bg-success");
+          if(msg.step >= 0){
+              step = " (krok "+ (msg.step) +")"
+          }else{
+              step = ''
+          }
+
+          $("#prog_val").html("Beží" + step );
+          $('.current_job_step').text(msg.step);
+          $('.current_job_msg').text(msg.message);
+          $('.current_job_time').text(msg.duration);
       }else{
-        $("#prog_val").html("Vypnuto");
-        $(".prog_card").removeClass(["bg-success"]);
+
       }
     });
 
@@ -403,6 +475,7 @@ var program_data = null;
 
       $("#program_info_bad").hide();
       $(".program_info_div").hide();
+      $("#program_steps_div").hide();
 
       clear_run_data();
       $.ajax({
@@ -441,6 +514,8 @@ function show_run_data(data){
   $("#program_info_name").val(data.name + " (run: "+ program_run_key +")");
   $("#program_info_author").val(data.author_name + " / " + data.run_author);
   // $("#program_info_author_run").val(data.run_author);
+  $("#program_steps_name").html(data.name + " - " + data.run_author);
+  $("#program_steps_ol").empty();
 
   duration_total = 0;
   steps_div = $("#program_info_steps");
@@ -449,11 +524,18 @@ function show_run_data(data){
   for(i in data.job){
     var step = data.job[i];
     console.log(i, step);
-    steps_div.append(" > " + step.operation + "("+ step.duration + ")");
+    steps_div.append(" > " + step.operation + " <span class='text-muted'>("+ step.duration + ")</span>");
+    $("#program_steps_ol").append("<li> <span class='text-muted'>"+ duration_total +"s ("+step.duration+"s) </span>" + step.operation +"</li>");
+    
     duration_total += Number(step['duration']);
   }
   steps_div.append(" > Konec");
-  $("#program_info_duration").val(String(duration_total) + " s");    
+
+  $("#program_steps_ol").append("<li> <span class='text-muted'>"+ (duration_total) +"s ("+20+"s) </span> Zavřít zářiče </li>");
+  $("#program_steps_ol").append("<li> <span class='text-muted'>"+ (duration_total+20) +"s ("+0+"s) </span> Ukončení programu </li>");
+
+  $("#program_info_duration").val(String(duration_total+20) + " s");
+  $(".current_job_total_time").html(duration_total+20); 
 }
 
 
@@ -472,6 +554,18 @@ function run_program(){
 
   run_program_srv.callService(request, function(result) {
     console.log('Result for service call on ', result);
+  });
+}
+
+
+function stop_program(){
+  var request = new ROSLIB.ServiceRequest({
+    run_id: '',
+    run_key: ''
+  });
+
+  run_program_srv.callService(request, function(result) {
+    console.log('Result for STOP program');
   });
 }
 
