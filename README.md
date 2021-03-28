@@ -1,7 +1,6 @@
 # IRRADROOM01
-Systém byl vyvinut firmou [UST.cz](www.ust.cz).
+Systém byl vyvinut firmou [UST.cz](www.ust.cz)
 
-![]()
 
 # Návod k použití
 _Uživatel zařízení by měl vždy postupovat podle tohoto návodu a neměl by zařízení nechávat bez dozoru nebo k němu pouštět uživatele neseznámené s touto příručkou._
@@ -33,8 +32,8 @@ Systém funguje tak, že uživatel si ve webovém prostředí přípraví progra
 Terminál slouží k základnímu zobrazení stavu systému a pro spouštění jednotlivých běhů programů. Terminál je umístěn u vstupních dveří do ozařovny. Tak, aby uživatel viděl, jestli vstup do místnosti je bezpečný a aby při spouštění programu mohl zkontrolovat, jestli se v místnosti nikdo nenachází. 
 
 
-
-## Řidící počítač
+## Tenchniké detaily
+### Řidící počítač
 
 * Odroid C2
 * Ubuntu 20.04.4 minimal ()
@@ -49,5 +48,5 @@ Terminál slouží k základnímu zobrazení stavu systému a pro spouštění j
 * Install `rosbridge_server` (from git; branch `ros2`)
 
 
-### ROS 2
+#### ROS 2
 Jako základní framework je použit ROS2. Domain ID je nastaveno na 35 v `~/.bashrc`.
