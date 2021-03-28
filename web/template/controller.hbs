@@ -12,41 +12,54 @@
 <script type="text/javascript" src="https://unpkg.com/tabulator-tables@4.9.3/dist/js/tabulator.min.js"></script>
 
 
-<div class="row row-cols-1 row-cols-md-3 g-4">
-  <div class="col">
-    <div class="card h-100">
-      <div class="card-header">
-        <h4>Vzdálenost stolu</h4>
-      </div>
-      <div class="card-body text-center">
-          <b><span id="distance_val">---</span></b> cm
-      </div>
-    </div>
-  </div>
+<div class="row row-cols-4 g-3">
 
+         <div class="col">
+          <div class="card text-white bg-secondary mb-3 prog_card">
+            <div class="card-header">
+              <b>Program</b>
+            </div>
+            <div class="card-body">
+              <span id="prog_val">---</span>
+            </div>
+          </div>
+        </div>
 
-    <div class="col">
-      <div class="card h-100 door_card">
-        <div class="card-header">
-          <h4>Dveře místnosti</h4>
+        <div class="col">
+          <div class="card source_card text-white bg-secondary mb-3">
+            <div class="card-header">
+              <b>Poloha zářiče</b>
+            </div>
+            <div class="card-body">
+              <span id="source_val">---</span>
+            </div>
+          </div>
         </div>
-        <div class="card-body text-center">
-            <span id="door_val"><b>Otevřěno/Zavřeno</b></span>
-        </div>
-      </div>
-    </div>
 
-    <div class="col">
-      <div class="card h-100">
-        <div class="card-header">
-          <h4>Stav zářiče</h4>
+        <div class="col">
+          <div class="card door_card text-white bg-secondary mb-3">
+            <div class="card-header">
+              <b>Dveře ozařovny</b>
+            </div>
+            <div class="card-body">
+              <span id="door_val">---</span>
+            </div>
+          </div>
         </div>
-        <div class="card-body text-center">
-            <b>Zavřeno/Zářič A/Zářič B/Pohyb</b>
+
+        <div class="col">
+          <div class="card text-white bg-secondary mb-3">
+            <div class="card-header">
+              <b>Vzdálenost stolu</b>
+            </div>
+            <div class="card-body"><span id="distance_val">---</span> cm
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
 </div>
+
+
+
 
 
 
@@ -54,11 +67,10 @@
 
 <div class="card my-3">
     <div class="card-header">
-        Přehled běhů
+        <span class="h5">Přehled pinů</span> <span class="text-muted"> - Zde jsou zobrazeny pouze mé běhy</span>
     </div>
     <div class="card-body">
         <div id="job_table"></div>
-        Zde jsou zobrazeny pouze mé běhy. 
     </div>
 </div>
 
@@ -166,7 +178,7 @@
 </div>
 
 
-
+<!-- 
 <div class="card my-3">
     <div class="card-header">
         Přehled měření
@@ -174,7 +186,7 @@
     <div class="card-body">
         Tady bude tabulka s provedenými měřeními
     </div>
-</div>
+</div> -->
 
 
 
@@ -318,14 +330,86 @@ var opened_program_data = null;
 
     door_msg.subscribe(function(msg) {
       $(".door_card").removeClass(["bg-secondary", "bg-danger"]);
-      console.log(msg)
       if(Number(msg.data)){
         $("#door_val").html("Otevřeno");
         $(".door_card").addClass("bg-danger");
 
       }else{
         $("#door_val").html("Zavřeno");
-        // $(".door_card").addClass("bg-secondary");
+        $(".door_card").addClass("bg-secondary");
+      }
+    });
+
+
+
+    var source_position = new ROSLIB.Topic({
+      ros : ros,
+      name : '/source_position_status',
+      messageType : 'std_msgs/Int8'
+    });
+    
+    source_position.subscribe(function(msg) {
+      $(".source_card").removeClass(["bg-secondary", "bg-warning"]);
+      if(Number(msg.data) != 0){
+        $("#source_val").html("Zářič aktivní <i class='bi bi-broadcast-pin'></i>");
+        $(".source_card").addClass("bg-warning");
+
+      }else{
+        $("#source_val").html("Zavřeno");
+        $(".source_card").addClass("bg-secondary <i class='bi bi-door-closed'></i>");
+      }
+    });
+
+
+var last_program_status = null;
+    var program_status = new ROSLIB.Topic({
+      ros : ros,
+      name : '/program_status',
+      messageType : 'irradroom_cmake/msg/ProgramStatus'
+    });
+    
+    program_status.subscribe(function(msg) {
+      //console.log(msg)
+
+      // Pri zmene statusu  
+      if(last_program_status != msg.program_status){
+        last_program_status = msg.program_status;
+
+        if(msg.program_status > 0){
+          console.log("Program je spusten");
+
+            $(".prog_card").addClass("bg-success");
+            $('.program_info_div').hide();
+            $('#program_steps_div').show();
+            $('.pin_buttons').attr('disabled', 'true');
+            $('.program_status_div').show();
+
+        } else {
+        // Pri ukonceni programu
+
+            $("#prog_val").html("Vypnuto");
+            $(".prog_card").removeClass(["bg-success"]);
+
+            $('.pin_buttons').removeAttr('disabled');   // Zapnout tlacitka
+            $('.program_status_div').hide();            // Schovat status programu
+            $("#program_steps_div").hide();
+
+        }
+      }
+
+      if(msg.program_status > 0){
+          if(msg.step >= 0){
+              step = " (krok "+ (msg.step) +")"
+          }else{
+              step = ''
+          }
+
+          $("#prog_val").html("Beží" + step );
+          $('.current_job_step').text(msg.step);
+          $('.current_job_msg').text(msg.message);
+          $('.current_job_time').text(msg.duration);
+      }else{
+
       }
     });
 
