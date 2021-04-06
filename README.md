@@ -1,5 +1,5 @@
 # IRRADROOM01
-Systém byl vyvinut firmou [UST.cz](www.ust.cz)
+Systém byl vyvinut firmou [Universal Scientific Technologies s.r.o.](https://www.ust.cz)
 
 
 # Návod k použití
