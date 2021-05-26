@@ -102,3 +102,10 @@ V poslední záložce terminálu uživatel nalezne popis terminálu a QR kód s 
 
 #### ROS 2
 Jako základní framework je použit ROS2. Domain ID je nastaveno na 35 v `~/.bashrc`.
+
+
+#### IP adresy:
+Terminál:
+``` *.*.*.79```
+Řídící počítač:
+```*.*.*.80```
