@@ -1,0 +1,12 @@
+[Unit]
+Description="UST IRRADROOM web interface"
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+Type=simple
+Environment=PYTHONUNBUFFERED=1
+WorkingDirectory=/root/dev_ws/IRRADROOM01/web
+ExecStart=/root/dev_ws/install/setup.sh; /usr/bin/python3 /root/dev_ws/IRRADROOM01/web/web.py
+

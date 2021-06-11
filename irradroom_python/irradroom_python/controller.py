@@ -73,7 +73,9 @@ class Controller(Node):
         msg.data = cmd
         self.pub_motor_cmd.publish(msg)
 
-    def do_step(self, job = None, step = None):
+    def do_step(self, job = None, step = -1):
+
+        step = int(step)
         self.logger.info("Do step {}, {}".format(step, job))
 
         self.actual_step = step+1
@@ -101,6 +103,9 @@ class Controller(Node):
             self.scheduler.enter(20, 1, self.do_step, kwargs={'job': 'end_program', 'step': -1})
             self.actual_message = "Ukončuji program"
             print("Konec!")
+
+        elif job == 'set_center':
+            self.send_motor_cmd('set_center')
 
         elif job == 'end_program':
             self.actual_run = None

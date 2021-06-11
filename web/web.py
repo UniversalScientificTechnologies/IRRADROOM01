@@ -36,6 +36,7 @@ class WebApp(tornado.web.Application):
             (r"/controller/get_program/(.*)", base.Controller_get_program),
             (r"/controller/queue_program/(.*)", base.Controller_queue_program),
             (r"/controller/edit_program/(.*)/(.*)/", base.Controller_edit_program),
+            (r"/controller/update_program/(.*)/", base.Controller_update_program),
             (r"/controller/remove_program_step/(.*)/(.*)/", base.Controller_remove_program_step),
             (r"/controller/create_program", base.Controller_create_program),
             (r"/poweroff", base.PowerOff),

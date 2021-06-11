@@ -240,6 +240,12 @@
               </div>
             </div>
 
+            <div  class="col text-start" id="program_info_bad_universal" style="display: none;">
+              <div class="card bg-danger">
+                <div class="card-body"></div>
+              </div>
+            </div>
+
             <div class="program_info_div"  style="display: none; overflow: scroll;"> 
 
               <div class="mb-1">
@@ -475,6 +481,16 @@
 
 
 
+    function set_program_info_bad(message){
+      $("#program_info_bad_universal").show();
+      $("#program_info_bad_universal").find('.card-body').empty();
+      $("#program_info_bad_universal").find('.card-body').text(message);
+
+      $(".program_info_div").hide();
+      $("#program_steps_div").hide();
+
+    };
+
 
 
 
@@ -494,6 +510,7 @@ var program_data = null;
       program_run_key = $("#program_run_key").val();
 
       $("#program_info_bad").hide();
+      $("#program_info_bad_universal").hide();
       $(".program_info_div").hide();
       $("#program_steps_div").hide();
 
@@ -574,6 +591,8 @@ function run_program(){
 
   run_program_srv.callService(request, function(result) {
     console.log('Result for service call on ', result);
+    set_program_info_bad(result.message);
+
   });
 }
 

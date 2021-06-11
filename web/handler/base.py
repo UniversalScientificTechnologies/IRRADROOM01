@@ -198,6 +198,24 @@ class Controller_edit_program(BaseHandler):
 
         self.write(json.dumps(step_data))
 
+
+class Controller_update_program(BaseHandler):
+    def get(self, program):
+
+        self.set_header("Content-Type", "application/json")
+        print("program", program)
+        name = self.get_argument('name')
+        print("program name", name)
+
+        
+
+        mdb = pymongo.MongoClient("mongodb://localhost:27017/").IRRADROOM
+        programs = mdb.programs.update({'_id': bson.ObjectId(program)},     
+            {"$set": {"name": name}}
+        )
+
+
+
 class State(BaseHandler):
     def get(self):
         print("State")

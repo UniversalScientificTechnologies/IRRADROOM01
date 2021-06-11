@@ -67,7 +67,7 @@
 
 <div class="card my-3">
     <div class="card-header">
-        <span class="h5">Přehled pinů</span> <span class="text-muted"> - Zde jsou zobrazeny pouze mé běhy</span>
+        <span class="h5">Přehled kódů</span> <span class="text-muted"> - Zde jsou zobrazeny pouze mé běhy</span>
     </div>
     <div class="card-body">
         <div id="job_table"></div>
@@ -87,63 +87,70 @@
         <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
           <ol class="breadcrumb" id="program_steps_view">
             <li class="breadcrumb-item active">Start</li>
-            <li class="breadcrumb-item">... ---- ....</li>
+            <li class="breadcrumb-item"></li>
             <li class="breadcrumb-item active">Konec</li>
           </ol>
         </nav>
 
-        <form id="program_step_editor" class="card" style="display: block;">
+        <form id="program_step_editor" class="" style="display: block;">
         {% module xsrf_form_html() %}
-          <div class="row g-2">
-            <div class="col-auto">
+        <div class="card">
+            <div class="card-body">
+          <div class="row">
+            <div class="col-2">
                 <label for="exampleInputEmail1" class="form-label col-auto">Operace:</label>
             </div>
-            <div class="col-auto">
+            <div class="col-10">
                 <select class="form-control" name="step_operation">
+                    <option value = 'PosA'>Zářič 1</option>
+                    <option value = 'PosB'>Zářič 2</option>
                     <option value = 'close'>Zavřeno</option>
                     <option value = 'sleep'>Pauza</option>
-                    <option value = 'PosA'>Zářič A</option>
-                    <option value = 'PosB'>Zářič B</option>
                 </select>
             </div>
-            <div class="col-auto">
+            <div class="col-2">
                 <label for="" class="form-label text-end">Délka:</label>
             </div>
-            <div class="col-auto">
+            <div class="col-10">
                 <input type="number" class="form-control" id="step_length", value="50", name="step_duration" id="step_duration">
             </div>
-            <div class="col-auto">
+            <div class="col-2">
                 <label for="" class="form-label text-end">Pořadí:</label>
             </div>
-            <div class="col-auto">
+            <div class="col-10">
                 <input type="number" class="form-control" id="step_number", name="step_number", value="0", id="step_number">
             </div>
-            <div class="col-auto">
+            <div class="col-12">
               <button type="submit" class="btn btn-primary">Přidat</button>
             </div>
           </div>
+            </div>
+        </div>
         </form>
 
         <form id="program_metadata_editor" style="display: block;">
         {% module xsrf_form_html() %}
+
+        <div class="card my-3">
+            <div class="card-body">
             <div class="row g-1 align-items-center">
 
-                <div class="col-auto">
+                <div class="col-2">
                     <label for="" class="form-label">Id: </label>
                 </div>
-                <div class="col-auto">
+                <div class="col-10">
                     <input type="text" class="form-control" id="program_id" disabled>
                 </div>
-                <div class="col-auto">
+                <div class="col-2">
                     <label for="" class="form-label">Název:</label>
                 </div>
-                <div class="col-auto">
-                    <input type="text" class="form-control" id="program_name">
+                <div class="col-10">
+                    <input type="text" class="form-control" id="program_name" name="name">
                 </div>
-                <div class="col-auto">
+                <div class="col-2">
                     <label for="" class="form-label">Autor:</label>
                 </div>
-                <div class="col-auto">
+                <div class="col-10">
                     <input type="text" class="form-control" id="program_author" disabled>
 
                 </div>
@@ -153,11 +160,13 @@
                 <div class="col-auto">
                     <input type="text" class="form-control" id="step_length" disabled>
                 </div> -->
-                <div class="col-auto">
+                <div class="col-12">
                     <br>
                     <button type="submit" class="btn btn-primary">Uložit</button>
                 </div>
             </div>
+        </div>
+    </div>
         </form>
 
         <button class="btn btn-success" onclick="queue_actual_program()">Přidat program do fronty</button>
@@ -178,7 +187,7 @@
 </div>
 
 
-<!-- 
+
 <div class="card my-3">
     <div class="card-header">
         Přehled měření
@@ -186,7 +195,7 @@
     <div class="card-body">
         Tady bude tabulka s provedenými měřeními
     </div>
-</div> -->
+</div>
 
 
 
@@ -273,7 +282,7 @@ var opened_program_data = null;
         e.preventDefault();
         var data = {};
         $("#program_step_editor :input").serializeArray().map(function(x){data[x.name] = x.value;});
-        console.log(data, e);
+        console.log("Add program step:", data, e);
 
 
         $.ajax({
@@ -286,6 +295,27 @@ var opened_program_data = null;
         });
 
     });
+
+
+
+    $('#program_metadata_editor').on('submit', function(e) {
+        e.preventDefault();
+        var data = {};
+        $("#program_metadata_editor :input").serializeArray().map(function(x){data[x.name] = x.value;});
+        console.log("Ulozit parametry programu:", data, e);
+
+
+        $.ajax({
+            url: "/controller/update_program/"+opened_program+'/',
+            data: data,
+            success: function(e){
+                load_progam(opened_program);
+            },
+            //dataType: dataType
+        });
+
+    });
+
 
 
     var table_program = new Tabulator("#program_table", {
