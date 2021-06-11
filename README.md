@@ -22,21 +22,18 @@ Systém funguje tak, že uživatel si ve webovém prostředí přípraví progra
 
 
 ## Webové rozhraní
+Webové rozhraní poskytuje rozhraní pro přístup pro správu a nastavování jednotlivých programů a pro získávání dat z nich. 
 
 
-### Tvorba nových užívatelů. 
-Tvorba nových uživatelů se neprovádí přes webové rozhraní. Pro tento účel existuje python skript, který vytvoří nového uživatele. Pokud uživatel již existuje, bude provedena jeho aktualizace. Skript se spouští příkazem `python3 update_user.py`. 
+### Tvorba programu
+na podstránce `/controller` naleznete formulář pro tvorbu programu. V sekci `Programy ozařovny` jsou vypsané všechny vytvořené programy. Nový program lze vytvořit kliknutím na modré tlačítko vytvořit nový program. Tím se otevře okno pro sestavení programu. V horní části jsou vidět jednotlivé kroky. Po vytvoření nového programu se zde nachází pouze `Start` a `Konec`.
 
-```bash
-# python3 update_user.py
-usage: update_user.py [-h] --login LOGIN --passw PASSW --name NAME
-```
+Nový krok se přidá tak, že se ze seznamu možných kroků vybere požadovaný krok. K němu se přiřadí délka trvání v sekundách a pořadí. Pokud přidáváme první krok, nemusíme položku pořadí měnit.
 
-_Aby vaše heslo nezůstalo v historii bashe, před příkaz vložte ` ` (mezeru)._
+
 
 
 ## Terminál
-
 Terminál je zařízení vybavené dotykovou obrazovkou sloužící k základnímu zobrazení stavu systému a pro spouštění jednotlivých běhů programů. Terminál je umístěn u vstupních dveří do ozařovny. Tak, aby uživatel viděl, jestli vstup do místnosti je bezpečný a aby při spouštění programu mohl zkontrolovat, jestli se v místnosti nikdo nenachází. 
 
 Na vrchní straně terminálu se vždy nachází název zařízení, který je zároveň tlačítkem pro znovu-načtení stránky. To může být řešením některých technických potíží. Během běžného provozu by nemělo být používáno. 
@@ -80,6 +77,15 @@ V pravém sloupci pak vidíte samotý průběh programu.
 ### O zařízení
 V poslední záložce terminálu uživatel nalezne popis terminálu a QR kód s odkazem a tento návod. 
 
+## Tvorba nových užívatelů. 
+Tvorba nových uživatelů se neprovádí přes webové rozhraní. Pro tento účel existuje python skript, který vytvoří nového uživatele. Pokud uživatel již existuje, bude provedena jeho aktualizace. Skript se spouští příkazem `python3 update_user.py`. 
+
+```bash
+# python3 update_user.py
+usage: update_user.py [-h] --login LOGIN --passw PASSW --name NAME
+```
+
+_Aby vaše heslo nezůstalo v historii bashe, před příkaz vložte ` ` (mezeru)._
 
 
 ## Technické detaily
